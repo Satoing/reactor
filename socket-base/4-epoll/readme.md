@@ -1,0 +1,2 @@
+server-block是使用LT+阻塞实现的服务端
+server-et是使用ET+非阻塞实现的服务端
