@@ -3,5 +3,6 @@
         "iostream": "cpp",
         "ostream": "cpp",
         "cstring": "cpp"
-    }
+    },
+    "C_Cpp.default.compilerPath": "/usr/bin/g++"
 }
