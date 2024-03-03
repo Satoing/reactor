@@ -2,7 +2,10 @@
     "files.associations": {
         "iostream": "cpp",
         "ostream": "cpp",
-        "cstring": "cpp"
+        "cstring": "cpp",
+        "mutex": "cpp",
+        "thread": "cpp",
+        "chrono": "cpp"
     },
     "C_Cpp.default.compilerPath": "/usr/bin/g++"
 }
