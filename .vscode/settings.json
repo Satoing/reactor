@@ -5,7 +5,8 @@
         "cstring": "cpp",
         "mutex": "cpp",
         "thread": "cpp",
-        "chrono": "cpp"
+        "chrono": "cpp",
+        "condition_variable": "cpp"
     },
     "C_Cpp.default.compilerPath": "/usr/bin/g++"
 }
