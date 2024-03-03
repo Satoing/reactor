@@ -15,7 +15,7 @@ using namespace std;
 
 int initserver(unsigned short port) {
     int listenfd;
-    if( (listenfd = socket(PF_INET, SOCK_STREAM, 0)) < 0) {
+    if( (listenfd = socket(PF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0)) < 0) {
         return -1;
     }
     struct sockaddr_in servaddr;
@@ -32,12 +32,6 @@ int initserver(unsigned short port) {
     return listenfd;
 }
 
-bool setnonblocking(int fd) {
-    int flags = fcntl(fd, F_GETFL, 0);
-    if(flags == -1) flags = 0;
-    return fcntl(fd, F_SETFL, flags | O_NONBLOCK);
-}
-
 int main() {
     int listenfd;
     if( (listenfd = initserver(5005)) < 0) {
@@ -51,7 +45,6 @@ int main() {
     setsockopt(listenfd, SOL_SOCKET, SO_REUSEPORT, &opt, static_cast<socklen_t>(sizeof opt));
     setsockopt(listenfd, SOL_SOCKET, SO_KEEPALIVE, &opt, static_cast<socklen_t>(sizeof opt));
 
-    setnonblocking(listenfd);
     cout << "监听套接字文件描述符：" << listenfd << endl;
 
     int epfd = epoll_create(1);
@@ -70,50 +63,51 @@ int main() {
             cout << "epoll timeout" << endl; continue;
         }
         for(int i = 0; i < infds; i++) {
-            if(events[i].data.fd == listenfd) {
-                while(true) {
-                    struct sockaddr_in clientaddr;
-                    socklen_t len = sizeof(clientaddr);
-                    int connfd = accept(listenfd, (struct sockaddr*)&clientaddr, &len);
-                    if(connfd < 0 && errno == EAGAIN) break;
-                    setnonblocking(connfd);
-                    cout << "connect client:" << inet_ntoa(clientaddr.sin_addr) 
-                         << ":" << ntohs(clientaddr.sin_port) << endl;
-
-                    event.data.fd = connfd;
-                    event.events = EPOLLIN | EPOLLET;
-                    epoll_ctl(epfd, EPOLL_CTL_ADD, connfd, &event);
-                }
-            } else {
-                if(events[i].events & EPOLLHUP) {
-                    cout << "1. 客户端断开连接" << endl;
-                    close(events[i].data.fd);
-                }
-                else if(events[i].events & EPOLLIN) {
-                    char buf[1024] = {0};
-                    int readn = 0;
-                    char *ptr = buf;
-
+            if(events[i].events & EPOLLHUP) {
+                cout << "1. 客户端断开连接" << endl;
+                close(events[i].data.fd);
+            }
+            else if(events[i].events & EPOLLIN) {
+                // listenfd上面有读事件
+                if(events[i].data.fd == listenfd) {
                     while(true) {
-                        if( (readn = recv(events[i].data.fd, ptr, 5, 0)) <= 0) {
-                            // 读取完毕
-                            if((readn < 0) && (errno == EAGAIN)) {
-                                send(events[i].data.fd, buf, strlen(buf), 0);
-                                cout << "发送数据：" << buf << endl;
-                            } else {
-                                cout << "2. 客户端断开连接" << endl;
-                                close(events[i].data.fd);
-                            }
-                            break;
-                        }
-                        ptr += readn;
+                        struct sockaddr_in clientaddr;
+                        socklen_t len = sizeof(clientaddr);
+                        int connfd = accept4(listenfd, (struct sockaddr*)&clientaddr, &len, SOCK_NONBLOCK);
+                        if(connfd < 0 && errno == EAGAIN) break;
+                        cout << "connect client:" << inet_ntoa(clientaddr.sin_addr) 
+                            << ":" << ntohs(clientaddr.sin_port) << endl;
+
+                        event.data.fd = connfd;
+                        event.events = EPOLLIN | EPOLLET;
+                        epoll_ctl(epfd, EPOLL_CTL_ADD, connfd, &event);
                     }
+                    continue;
                 }
-                else if(events[i].events & EPOLLOUT) {}
-                else {
-                    cout << "3. 出现错误" << endl;
-                    close(events[i].data.fd);
+                // connfd上有读事件
+                char buf[1024] = {0};
+                int readn = 0;
+                char *ptr = buf;
+
+                while(true) {
+                    if( (readn = recv(events[i].data.fd, ptr, 5, 0)) <= 0) {
+                        // 读取完毕
+                        if((readn < 0) && (errno == EAGAIN)) {
+                            send(events[i].data.fd, buf, strlen(buf), 0);
+                            cout << "发送数据：" << buf << endl;
+                        } else {
+                            cout << "2. 客户端断开连接" << endl;
+                            close(events[i].data.fd);
+                        }
+                        break;
+                    }
+                    ptr += readn;
                 }
+            }
+            else if(events[i].events & EPOLLOUT) {}
+            else {
+                cout << "3. 出现错误" << endl;
+                close(events[i].data.fd);
             }
         }
     }
