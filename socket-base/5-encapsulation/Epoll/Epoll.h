@@ -9,7 +9,6 @@
 #include <vector>
 #include <iostream>
 #include "Channel.h"
-using namespace std;
 
 
 class Channel;
@@ -24,6 +23,6 @@ public:
     ~Epoll();
     // void addfd(int fd, uint32_t op);
     void updateChannel(Channel *ch);  // 使用联合类型中的指针，将Channel类添加到红黑树上 
-    // std::vector<epoll_event> loop(int timeout = -1);
+    // std::std::vector<epoll_event> loop(int timeout = -1);
     std::vector<Channel*> loop(int timeout = -1);
 };

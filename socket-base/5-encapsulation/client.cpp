@@ -79,13 +79,13 @@ int main(int argc, char *argv[]) {
         buf = "这是第"+to_string(i+1)+"个消息";
 
         if(client.send(buf) == false) {
-            cout << "send failed." << endl;
+            std::cout << "send failed." << std::endl;
         }
-        cout << "发送内容：" << buf << endl;
+        std::cout << "发送内容：" << buf << std::endl;
         if(client.recv(buf, 1024) == false) {
-            cout << "recv failed." << endl;
+            std::cout << "recv failed." << std::endl;
         }
-        cout << "接收内容：" << buf << endl;
+        std::cout << "接收内容：" << buf << std::endl;
         sleep(1);
     }
     client.close();
