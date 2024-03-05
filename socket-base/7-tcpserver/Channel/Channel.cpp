@@ -37,22 +37,6 @@ uint32_t Channel::revents() {
     return revents_;
 }
 
-#include "Connection.h"
-
-void Channel::newconnection(Socket &sock) {
-    while(true) {
-        InetAddress clientaddr;
-        Socket *connsock = new Socket(sock.accept(clientaddr));
-        if(connsock->fd() < 0 && errno == EAGAIN) break;
-        
-        std::cout << "connect client:" << clientaddr.ip() << ":" << clientaddr.port() 
-                << ", fd:" << connsock->fd() << std::endl;
-
-        Connection *connection = new Connection(loop_, connsock);
-    }
-    return;
-}
-
 void Channel::onmessage() {
     char buf[1024] = {0};
     int readn = 0;

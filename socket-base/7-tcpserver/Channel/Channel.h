@@ -30,7 +30,6 @@ public:
     uint32_t revents();
     void handleevent();
 
-    void newconnection(Socket &sock);
     void onmessage();
     void setcallback(std::function<void()> fn);
 };
