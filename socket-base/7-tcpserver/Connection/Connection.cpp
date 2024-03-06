@@ -29,14 +29,10 @@ int Connection::fd() const {
 }
 
 void Connection::errorcallback() {
-    // std::cout << "连接出现错误" << std::endl;
-    // close(fd());
     errorcallback_(this);
 }
 
 void Connection::closecallback() {
-    // std::cout << "客户端断开连接" << std::endl;
-    // close(fd());
     closecallback_(this);
 }
 

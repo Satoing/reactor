@@ -19,8 +19,8 @@ void TcpServer::start() {
 
 void TcpServer::newconnection(Socket *connsock) {
     Connection *connection = new Connection(&loop_, connsock);
-    connection->setclosecallback(std::bind(&TcpServer::closeconnection, this, connection));
-    connection->seterrorcallback(std::bind(&TcpServer::errorconnection, this, connection));
+    connection->setclosecallback(std::bind(&TcpServer::closeconnection, this, std::placeholders::_1));
+    connection->seterrorcallback(std::bind(&TcpServer::errorconnection, this, std::placeholders::_1));
     conns_[connection->fd()] = connection;
     std::cout << "connect client:" << connection->ip() << ":" << connection->port() 
                 << ", fd:" << connection->fd() << std::endl;

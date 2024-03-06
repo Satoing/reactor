@@ -29,6 +29,7 @@ void Acceptor::newconnection() {
     while(true) {
         InetAddress clientaddr;
         Socket *connsock = new Socket(servsock_->accept(clientaddr));
+        connsock->setipport(clientaddr.ip(), clientaddr.port());
         if(connsock->fd() < 0 && errno == EAGAIN) break;
 
         // 回调函数

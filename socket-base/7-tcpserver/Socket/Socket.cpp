@@ -67,3 +67,8 @@ std::string Socket::ip() const {
 uint16_t Socket::port() const {
     return port_;
 }
+
+void Socket::setipport(const std::string ip, uint16_t port) {
+    ip_ = ip;
+    port_ = port;
+}
