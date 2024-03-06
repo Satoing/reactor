@@ -14,7 +14,9 @@ private:
     bool inepoll_ = false;
     uint32_t events_ = 0;
     uint32_t revents_ = 0;
-    std::function<void()> callback_;
+    std::function<void()> readcallback_;
+    std::function<void()> errorcallback_;
+    std::function<void()> closecallback_;
 public:
     Channel(int fd, EventLoop *loop);
     ~Channel();
@@ -31,5 +33,8 @@ public:
     void handleevent();
 
     void onmessage();
-    void setcallback(std::function<void()> fn);
+
+    void setreadcallback(std::function<void()> fn);
+    void seterrorcallback(std::function<void()> fn);
+    void setclosecallback(std::function<void()> fn);
 };

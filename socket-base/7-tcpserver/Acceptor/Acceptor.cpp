@@ -15,7 +15,7 @@ Acceptor::Acceptor(EventLoop *loop, const std::string &ip, uint16_t port): loop_
     // EventLoop loop;
     acceptchannel_ = (Channel*)new Channel(servsock_->fd(), loop_);
     acceptchannel_->enablereading();
-    acceptchannel_->setcallback(std::bind(&Acceptor::newconnection, this));
+    acceptchannel_->setreadcallback(std::bind(&Acceptor::newconnection, this));
 }
 
 Acceptor::~Acceptor() {
@@ -30,9 +30,6 @@ void Acceptor::newconnection() {
         InetAddress clientaddr;
         Socket *connsock = new Socket(servsock_->accept(clientaddr));
         if(connsock->fd() < 0 && errno == EAGAIN) break;
-        
-        std::cout << "connect client:" << clientaddr.ip() << ":" << clientaddr.port() 
-                << ", fd:" << connsock->fd() << std::endl;
 
         // 回调函数
         newconncallback_(connsock);

@@ -11,7 +11,7 @@ int createnonblocking() {
 Socket::Socket(int fd):fd_(fd) {}
 
 Socket::~Socket() {
-    // ::close(fd_);
+    ::close(fd_);
 }
 
 int Socket::fd() const {
@@ -40,6 +40,8 @@ void Socket::setkeepalive(bool on) {
 
 void Socket::bind(InetAddress &servaddr) {
     if(::bind(fd_, servaddr.addr(), sizeof(sockaddr)) < 0) exit(-1);
+    ip_ = servaddr.ip();
+    port_ = servaddr.port();
 }
 
 void Socket::listen(int qn) {
@@ -51,5 +53,17 @@ int Socket::accept(InetAddress &clientaddr) {
     socklen_t len = sizeof(peeraddr);
     int connfd = accept4(fd_, (struct sockaddr*)&peeraddr, &len, SOCK_NONBLOCK);
     clientaddr.setaddr(peeraddr);
+
+    ip_ = clientaddr.ip();
+    port_ = clientaddr.port();
+
     return connfd;
+}
+
+std::string Socket::ip() const {
+    return ip_;
+}
+
+uint16_t Socket::port() const {
+    return port_;
 }

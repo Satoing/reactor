@@ -17,11 +17,15 @@ int createnonblocking();
 class Socket {
 private:
     const int fd_;           // 只在构造的时候传入
+    std::string ip_;         // 监听socket ip为服务端ip，连接socket ip为对端ip
+    uint16_t port_;
 public:
     Socket(int fd);
     ~Socket();
 
     int fd() const;
+    std::string ip() const;
+    uint16_t port() const;
     void setreuseaddr(bool on);
     void settcpnodelay(bool on);
     void setreuseport(bool on);

@@ -49,8 +49,7 @@ void Channel::onmessage() {
                 send(fd_, buf, strlen(buf), 0);
                 std::cout << "发送数据：" << buf << std::endl;
             } else {
-                std::cout << "2. 客户端断开连接" << std::endl;
-                close(fd_);
+               closecallback_();
             }
             break;
         }
@@ -60,19 +59,25 @@ void Channel::onmessage() {
 
 void Channel::handleevent() {
     if(revents_ & EPOLLHUP) {
-        std::cout << "1. 客户端断开连接" << std::endl;
-        close(fd_);
+        closecallback_();
     }
     else if(revents_ & EPOLLIN) {
-        callback_();
+        readcallback_();
     }
     else if(revents_ & EPOLLOUT) {}
     else {
-        std::cout << "3. 出现错误" << std::endl;
-        close(fd_);
+        errorcallback_();
     }
 }
 
-void Channel::setcallback(std::function<void()> fn) {
-    callback_ = fn;
+void Channel::setreadcallback(std::function<void()> fn) {
+    readcallback_ = fn;
+}
+
+void Channel::seterrorcallback(std::function<void()> fn) {
+    errorcallback_ = fn;
+}
+
+void Channel::setclosecallback(std::function<void()> fn) {
+    closecallback_ = fn;
 }
