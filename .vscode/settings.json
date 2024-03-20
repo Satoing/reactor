@@ -45,7 +45,10 @@
         "sstream": "cpp",
         "stdexcept": "cpp",
         "streambuf": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "functional": "cpp",
+        "iterator": "cpp",
+        "map": "cpp"
     },
     "C_Cpp.default.compilerPath": "/usr/bin/g++"
 }

@@ -1,0 +1,10 @@
+../bin/client 127.0.0.1 5005&
+../bin/client 127.0.0.1 5005&
+../bin/client 127.0.0.1 5005&
+../bin/client 127.0.0.1 5005&
+../bin/client 127.0.0.1 5005&
+../bin/client 127.0.0.1 5005&
+../bin/client 127.0.0.1 5005&
+../bin/client 127.0.0.1 5005&
+../bin/client 127.0.0.1 5005&
+../bin/client 127.0.0.1 5005&
